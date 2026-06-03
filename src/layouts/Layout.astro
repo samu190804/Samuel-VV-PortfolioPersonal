@@ -7,10 +7,18 @@ import "../styles/global.css";
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+		/>
 		<title>{Astro.props.title}</title>
 	</head>
 	<body>
 		<slot />
+		<form name="contacto" data-netlify="true" netlify-honeypot="bot-field" hidden>
+			<input type="text" name="nombre" />
+			<input type="email" name="email" />
+			<textarea name="mensaje"></textarea>
+		</form>
 	</body>
 </html>
