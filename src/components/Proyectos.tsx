@@ -50,8 +50,8 @@ const projects: Project[] = [
         description:
             "Este mismo portfolio. Diseñado con una estética dark minimalista inspirada en Zen Browser. Construido con Astro para máximo rendimiento estático y React para los componentes interactivos.",
         tech: ["Astro", "React", "TypeScript", "Tailwind CSS"],
-        github: "https://github.com/tuusuario/portfolio",
-        live: "https://tudominio.dev",
+        github: "https://github.com/samu190804/Samuel-VV-PortfolioPersonal",
+        live: "https://samuelvv.netlify.app/",
         gradient: "from-cyan-600/20 via-transparent to-transparent",
         accentColor: "#3B82F6",
         previewContent: "portfolio",
@@ -155,7 +155,7 @@ function ProjectPreview({ project }: { project: Project }) {
                     <BrowserMockup
                         src="/portfolio-preview.png"
                         alt="Captura del portfolio"
-                        url="tudominio.dev"
+                        url="https://samuelvv.netlify.app/"
                     />
                 ) : (
                     <PreviewIllustration type={project.previewContent} color={project.accentColor} />
