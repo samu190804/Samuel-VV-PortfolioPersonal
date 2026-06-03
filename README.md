@@ -4,6 +4,22 @@
 npm create astro@latest -- --template basics
 ```
 
+## Dependencies
+
+Tailwind CSS
+```bash
+npx astro add tailwind
+```
+React (para componentes interactivos de IA)
+```bash
+npx astro add react
+```
+Utilidades extra recomendadas
+```bash
+npm install -D @types/react @types/react-dom
+npm install lucide-react
+```
+
 > 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
 ## 🚀 Project Structure

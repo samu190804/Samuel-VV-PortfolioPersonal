@@ -1,1 +1,47 @@
 @import "tailwindcss";
+
+/* Configuración personalizada de Tailwind v4 */
+@theme {
+  --color-zen-dark: #0A0A0A;
+  --color-zen-gray: #1A1A1A;
+  --color-zen-border: #2A2A2A;
+  --color-zen-accent: #3B82F6;
+
+  --animate-gradient: gradient 3s ease infinite;
+}
+
+/* Keyframes fuera de @theme */
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+/* Clases personalizadas estilo Zen Browser */
+@layer components {
+  .glass {
+    background: rgba(26, 26, 26, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.5rem;
+  }
+
+  .glass-card {
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(30, 30, 30, 0.5);
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-zen-dark);
+    color: white;
+  }
+}

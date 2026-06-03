@@ -1,11 +1,18 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import TechStack from "../components/TechStack.astro";
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Samuel Villaescusa | Full Stack & AI Specialist">
+	<NavBar />
+	<Hero />
+	<TechStack />
+	{/* Aquí irán el resto de secciones: Experiencia, Proyectos, Contacto */}
+	<div class="h-[50vh] flex items-center justify-center text-gray-500">
+		<p class="text-center">
+			Próximamente: Experiencia, Proyectos y Contacto
+		</p>
+	</div>
 </Layout>
