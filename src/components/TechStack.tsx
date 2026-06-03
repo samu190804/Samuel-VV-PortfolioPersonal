@@ -63,7 +63,7 @@ const categories: Category[] = [
             { name: "Docker",      icon: "devicon-docker-plain colored",      color: "#2496ED" },
             { name: "Azure",       icon: "devicon-azure-plain colored",       color: "#0089D6" },
             { name: "Git",         icon: "devicon-git-plain colored",         color: "#F05032" },
-            { name: "GitHub",      icon: "devicon-github-original colored",   color: "#ffffff" },
+            { name: "GitHub",      icon: "devicon-github-original",           color: "#ffffff" },
             { name: "Grafana",     icon: "devicon-grafana-plain colored",     color: "#F46800" },
             { name: "Prometheus",  icon: "devicon-prometheus-original colored", color: "#E6522C" },
             { name: "Kafka",       icon: "devicon-apachekafka-original colored", color: "#231F20" },
