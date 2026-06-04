@@ -225,7 +225,7 @@ export default function Proyectos() {
                                     <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${activeId === project.id ? "text-white" : "text-gray-400 group-hover:text-gray-200"}`}>
                                         {project.title}
                                     </h3>
-                                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">
+                                    <p className="text-sm text-gray-500 leading-relaxed lg:line-clamp-2">
                                         {project.description}
                                     </p>
 
@@ -266,7 +266,7 @@ export default function Proyectos() {
                                                 <ExternalLink className="w-3.5 h-3.5" />
                                             </a>
                                         )}
-                                        <span className="ml-auto flex items-center gap-1 text-xs transition-all duration-300"
+                                        <span className="ml-auto hidden lg:flex items-center gap-1 text-xs transition-all duration-300"
                                             style={{ color: activeId === project.id ? project.accentColor : "transparent" }}>
                                             Ver preview <ArrowRight className="w-3 h-3" />
                                         </span>
