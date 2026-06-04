@@ -1,62 +1,41 @@
-# Astro Starter Kit: Basics
+## Portfolio Personal
 
-```sh
-npm create astro@latest -- --template basics
-```
+Este repositorio contiene mi sitio web de portfolio personal creado con Astro. Aquí encontrarás información sobre el proyecto, cómo ejecutarlo localmente.
 
-## Dependencies
+### Qué incluye
+- Sitio estático con Astro
+- Estilos con Tailwind CSS
+- Componentes React para secciones interactivas
 
-Tailwind CSS
+### Ejecutar localmente
+Instala dependencias y ejecuta el servidor de desarrollo:
+
 ```bash
-npx astro add tailwind
-```
-React (para componentes interactivos de IA)
-```bash
-npx astro add react
-```
-Utilidades extra recomendadas
-```bash
-npm install -D @types/react @types/react-dom
-npm install lucide-react
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+El sitio quedará disponible en `http://localhost:4321` por defecto.
 
-## 🚀 Project Structure
+### Estructura relevante
 
-Inside of your Astro project, you'll see the following folders and files:
+- `public/` — archivos estáticos (favicon, imágenes públicas)
+- `src/pages/` — páginas (por ejemplo `index.astro`)
+- `src/components/` — componentes reutilizables (Hero, Navbar, Proyectos, Contacto)
+- `src/styles/` — CSS global
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+### Despliegue
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Puedes desplegar en Vercel, Netlify o cualquier proveedor que soporte sitios estáticos construidos con Astro.
 
-## 🧞 Commands
+En mi caso opté por Netlify.
 
-All commands are run from the root of the project, from a terminal:
+### Dependencias útiles
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- Astro
+- Tailwind CSS
+- React
+- devicons
+- lucide-react
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+---
