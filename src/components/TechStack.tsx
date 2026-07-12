@@ -27,10 +27,11 @@ const categories: Category[] = [
     {
         label: "Lenguajes",
         items: [
-            { name: "Java",       icon: "devicon-java-plain colored",       color: "#f89820" },
+            { name: "Java",       icon: "devicon-java-plain colored",          color: "#f89820" },
             { name: "C#",         icon: "devicon-csharp-plain colored",        color: "#9B4F96" },
-            { name: "Python",     icon: "devicon-python-plain colored",     color: "#3776AB" },
-            { name: "JavaScript", icon: "devicon-javascript-plain colored", color: "#F7DF1E" },
+            { name: "Python",     icon: "devicon-python-plain colored",        color: "#3776AB" },
+            { name: "JavaScript", icon: "devicon-javascript-plain colored",    color: "#F7DF1E" },
+            { name: "TypeScript", icon: "devicon-typescript-plain colored",    color: "#3178C6" },
             { name: "PHP",        icon: "devicon-php-plain colored",           color: "#8892BE" },
             { name: "HTML5",      icon: "devicon-html5-plain colored",         color: "#E34F26" },
             { name: "CSS3",       icon: "devicon-css3-plain colored",          color: "#1572B6" },
