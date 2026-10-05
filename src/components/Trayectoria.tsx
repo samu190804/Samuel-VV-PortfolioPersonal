@@ -38,7 +38,7 @@ const entries: TimelineEntry[] = [
     },
     {
         type: "education",
-        date: "Sep 2025 — Actual",
+        date: "Sep 2025 — Jun 2026",
         title: "Especialización en IA y Big Data",
         organization: "IES San Vicente del Raspeig",
         description:
