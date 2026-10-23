@@ -13,8 +13,15 @@ type Project = {
     gradient: string;
     accentColor: string;
     // Simulamos una preview con una ilustración SVG inline
-    previewContent: "tfg" | "portfolio" | "mes";
+    previewContent: "tfg" | "portfolio" | "mes" | "review";
 };
+
+const reviewShots = [
+    { src: "/review-ai/analizar-vacio.png", label: "Analizar", alt: "Formulario para analizar una reseña" },
+    { src: "/review-ai/analizar-resultado.png", label: "Resultado", alt: "Reseña aprobada con sus estrellas" },
+    { src: "/review-ai/historial.png", label: "Historial", alt: "Historial con filtro por estado" },
+    { src: "/review-ai/estadisticas.png", label: "Estadísticas", alt: "Panel de estadísticas con gráficas" },
+];
 
 const projects: Project[] = [
     {
@@ -55,6 +62,19 @@ const projects: Project[] = [
         gradient: "from-cyan-600/20 via-transparent to-transparent",
         accentColor: "#3B82F6",
         previewContent: "portfolio",
+    },
+        {
+        id: "review",
+        title: "Review AI Platform",
+        subtitle: "Proyecto personal · 2026",
+        description:
+            "Plataforma de análisis de reseñas con IA: modera cada texto (reglas + Detoxify) y le asigna de 1 a 5 estrellas con un BERT multilingüe. Arquitectura de microservicios con Angular, Spring Boot y FastAPI, todo en local con Docker Compose. Evaluada con 200 reseñas etiquetadas a mano: 96.5 % de acierto a ±1 estrella.",
+        tech: ["Angular", "Spring Boot", "FastAPI", "PostgreSQL", "Docker", "Tailwind CSS"],
+        github: "https://github.com/samu190804/review-ai-platform",
+        live: undefined,
+        gradient: "from-indigo-600/20 via-transparent to-transparent",
+        accentColor: "#6366F1",
+        previewContent: "review",
     },
 ];
 
@@ -129,8 +149,42 @@ function PreviewIllustration({ type, color }: { type: Project["previewContent"];
     return null;
 }
 
+function ReviewGallery({ color }: { color: string }) {
+    const [index, setIndex] = useState(0);
+    const shot = reviewShots[index];
+
+    return (
+        <div className="flex flex-col gap-3">
+            <BrowserMockup src={shot.src} alt={shot.alt} url="localhost:4200" />
+            <div className="flex flex-wrap justify-center gap-2">
+                {reviewShots.map((s, i) => (
+                    <button
+                        key={s.src}
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setIndex(i);
+                        }}
+                        className="text-xs px-3 py-1 rounded-full border transition-colors duration-200"
+                        style={{
+                            borderColor: i === index ? color : "rgba(255,255,255,0.08)",
+                            color: i === index ? color : "#6b7280",
+                            background: i === index ? `${color}15` : "transparent",
+                        }}
+                    >
+                        {s.label}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function ProjectPreview({ project }: { project: Project }) {
-    const isBrowser = project.previewContent === "tfg" || project.previewContent === "portfolio";
+    const isBrowser =
+        project.previewContent === "tfg" ||
+        project.previewContent === "portfolio" ||
+        project.previewContent === "review";
 
     return (
         <div
@@ -145,7 +199,9 @@ function ProjectPreview({ project }: { project: Project }) {
                 }}
             />
             <div className="relative z-10 w-full h-full p-4">
-                {project.previewContent === "tfg" ? (
+                {project.previewContent === "review" ? (
+                    <ReviewGallery color={project.accentColor} />
+                ) : project.previewContent === "tfg" ? (
                     <BrowserMockup
                         src="/home.png"
                         alt="Captura del TFG S+ Fitness"
