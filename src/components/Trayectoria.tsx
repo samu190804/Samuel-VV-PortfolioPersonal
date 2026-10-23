@@ -27,7 +27,7 @@ const entries: TimelineEntry[] = [
     {
         type: "work",
         date: "Abr 2024 — Sep 2025",
-        title: "Programador Junior",
+        title: "Junior Full Stack Developer",
         organization: "Magnanni Inc.",
         bullets: [
             "Desarrollo de un sistema MES multiplataforma con Electron.js, Svelte y Node.js para la digitalización del control de calidad en planta.",
