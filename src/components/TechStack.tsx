@@ -7,6 +7,7 @@ type Tech = {
     name: string;
     icon: string;   // clase devicon
     color: string;  // color oficial para el hover/glow
+    iconColor?: string; // solo si el icono no trae color propio en devicon
 };
 
 type Category = {
@@ -47,6 +48,7 @@ const categories: Category[] = [
             { name: "Svelte",     icon: "devicon-svelte-plain colored",     color: "#FF3E00" },
             { name: "Vue",        icon: "devicon-vuejs-plain colored",      color: "#42B883" },
             { name: "React",      icon: "devicon-react-original colored",   color: "#61DAFB" },
+            { name: "Angular",    icon: "devicon-angular-plain",            color: "#F20756", iconColor: "#F20756" },
             { name: "Node.js",    icon: "devicon-nodejs-plain colored",     color: "#339933" },
         ],
     },
@@ -54,6 +56,7 @@ const categories: Category[] = [
         label: "Bases de Datos",
         items: [
             { name: "MySQL",  icon: "devicon-mysql-original colored",  color: "#4479A1" },
+            { name: "PostgreSQL", icon: "devicon-postgresql-plain colored", color: "#4169E1" },
             { name: "Neo4j",  icon: "devicon-neo4j-plain colored",  color: "#008CC1" },
             { name: "MongoDB", icon: "devicon-mongodb-plain colored", color: "#47A248" },
         ],
@@ -124,6 +127,7 @@ function TechCard({ tech }: { tech: Tech }) {
             {/* Icono devicon */}
             <i
                 className={`${tech.icon} text-4xl relative z-10 transition-transform duration-300 group-hover:scale-110`}
+                style={tech.iconColor ? { color: tech.iconColor } : undefined}
             />
 
             <span className="relative z-10 text-xs font-medium text-gray-400 group-hover:text-white transition-colors duration-300 text-center leading-tight">
