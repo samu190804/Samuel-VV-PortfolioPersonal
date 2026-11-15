@@ -12,9 +12,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.6",
+    "@astrojs/react": "^7.1.9",
     "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.4.2",
+    "astro": "^7.4.12",
     "devicons": "^2.0.1",
     "lucide-react": "^1.17.0",
     "react": "^19.2.6",

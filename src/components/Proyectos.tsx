@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ExternalLink, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ExternalLink, ArrowRight, X } from "lucide-react";
 import BrowserMockup from "./BrowserMockup";
 
 type Project = {
@@ -149,13 +149,36 @@ function PreviewIllustration({ type, color }: { type: Project["previewContent"];
     return null;
 }
 
-function ReviewGallery({ color }: { color: string }) {
+type ZoomHandler = (src: string, alt: string) => void;
+
+function ReviewGallery({ color, onZoom }: { color: string; onZoom?: ZoomHandler }) {
     const [index, setIndex] = useState(0);
+    const touchStart = useRef<{ x: number; y: number } | null>(null);
     const shot = reviewShots[index];
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    };
+    const onTouchEnd = (e: React.TouchEvent) => {
+        const start = touchStart.current;
+        touchStart.current = null;
+        if (!start) return;
+        const dx = e.changedTouches[0].clientX - start.x;
+        const dy = e.changedTouches[0].clientY - start.y;
+        if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+        setIndex((i) => (dx < 0 ? Math.min(i + 1, reviewShots.length - 1) : Math.max(i - 1, 0)));
+    };
 
     return (
         <div className="flex flex-col gap-3">
-            <BrowserMockup src={shot.src} alt={shot.alt} url="localhost:4200" />
+            <div
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+                onClick={onZoom ? () => onZoom(shot.src, shot.alt) : undefined}
+                className={onZoom ? "cursor-zoom-in" : undefined}
+            >
+                <BrowserMockup src={shot.src} alt={shot.alt} url="localhost:4200" />
+            </div>
             <div className="flex flex-wrap justify-center gap-2">
                 {reviewShots.map((s, i) => (
                     <button
@@ -165,7 +188,7 @@ function ReviewGallery({ color }: { color: string }) {
                             e.stopPropagation();
                             setIndex(i);
                         }}
-                        className="text-xs px-3 py-1 rounded-full border transition-colors duration-200"
+                        className="text-xs px-3 py-2 lg:py-1 rounded-full border transition-colors duration-200"
                         style={{
                             borderColor: i === index ? color : "rgba(255,255,255,0.08)",
                             color: i === index ? color : "#6b7280",
@@ -180,7 +203,7 @@ function ReviewGallery({ color }: { color: string }) {
     );
 }
 
-function ProjectPreview({ project }: { project: Project }) {
+function ProjectPreview({ project, onZoom }: { project: Project; onZoom?: ZoomHandler }) {
     const isBrowser =
         project.previewContent === "tfg" ||
         project.previewContent === "portfolio" ||
@@ -200,19 +223,29 @@ function ProjectPreview({ project }: { project: Project }) {
             />
             <div className="relative z-10 w-full h-full p-4">
                 {project.previewContent === "review" ? (
-                    <ReviewGallery color={project.accentColor} />
+                    <ReviewGallery color={project.accentColor} onZoom={onZoom} />
                 ) : project.previewContent === "tfg" ? (
-                    <BrowserMockup
-                        src="/home.png"
-                        alt="Captura del TFG S+ Fitness"
-                        url="s-fitness.app"
-                    />
+                    <div
+                        onClick={onZoom ? () => onZoom("/home.png", "Captura del TFG S+ Fitness") : undefined}
+                        className={onZoom ? "cursor-zoom-in" : undefined}
+                    >
+                        <BrowserMockup
+                            src="/home.png"
+                            alt="Captura del TFG S+ Fitness"
+                            url="s-fitness.app"
+                        />
+                    </div>
                 ) : project.previewContent === "portfolio" ? (
-                    <BrowserMockup
-                        src="/portfolio-preview.png"
-                        alt="Captura del portfolio"
-                        url="https://samuelvv.netlify.app/"
-                    />
+                    <div
+                        onClick={onZoom ? () => onZoom("/portfolio-preview.png", "Captura del portfolio") : undefined}
+                        className={onZoom ? "cursor-zoom-in" : undefined}
+                    >
+                        <BrowserMockup
+                            src="/portfolio-preview.png"
+                            alt="Captura del portfolio"
+                            url="https://samuelvv.netlify.app/"
+                        />
+                    </div>
                 ) : (
                     <PreviewIllustration type={project.previewContent} color={project.accentColor} />
                 )}
@@ -221,10 +254,164 @@ function ProjectPreview({ project }: { project: Project }) {
     );
 }
 
+const thumbnails: Partial<Record<Project["previewContent"], { src: string; alt: string }>> = {
+    tfg: { src: "/home.png", alt: "Captura del TFG S+ Fitness" },
+    portfolio: { src: "/portfolio-preview.png", alt: "Captura del portfolio" },
+    review: { src: reviewShots[0].src, alt: reviewShots[0].alt },
+};
+
+function ProjectThumbnail({ project }: { project: Project }) {
+    const thumb = thumbnails[project.previewContent];
+    return (
+        <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-white/8 bg-zinc-900">
+            {thumb ? (
+                <img src={thumb.src} alt={thumb.alt} loading="lazy" className="w-full h-full object-cover object-top" />
+            ) : (
+                <PreviewIllustration type={project.previewContent} color={project.accentColor} />
+            )}
+        </div>
+    );
+}
+
+function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
+    const [zoom, setZoom] = useState<{ src: string; alt: string } | null>(null);
+    const panelRef = useRef<HTMLDivElement>(null);
+    const touchY = useRef<number | null>(null);
+
+    useEffect(() => {
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key !== "Escape") return;
+            if (zoom) setZoom(null);
+            else onClose();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener("keydown", onKey);
+        };
+    }, [zoom, onClose]);
+
+    // Deslizar hacia abajo (con el panel en lo alto del scroll) para cerrar
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchY.current = panelRef.current && panelRef.current.scrollTop === 0 ? e.touches[0].clientY : null;
+    };
+    const onTouchEnd = (e: React.TouchEvent) => {
+        if (touchY.current !== null && e.changedTouches[0].clientY - touchY.current > 90) onClose();
+        touchY.current = null;
+    };
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm lg:hidden"
+            style={{ animation: "modalFade 0.2s ease forwards" }}
+            onClick={onClose}
+            role="dialog"
+            aria-modal="true"
+            aria-label={project.title}
+        >
+            <div
+                ref={panelRef}
+                onClick={(e) => e.stopPropagation()}
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+                className="relative w-full max-w-lg max-h-[88vh] overflow-y-auto overscroll-contain rounded-2xl border border-white/10 bg-zinc-950 p-5"
+                style={{
+                    animation: "modalScale 0.25s ease forwards",
+                    boxShadow: `0 0 0 1px ${project.accentColor}30, 0 16px 48px ${project.accentColor}20`,
+                }}
+            >
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Cerrar"
+                    className="absolute top-3 right-3 z-20 flex items-center justify-center w-11 h-11 rounded-full bg-zinc-900/90 border border-white/10 text-gray-300"
+                >
+                    <X className="w-5 h-5" />
+                </button>
+
+                <p className="text-xs font-mono mb-1 pr-12" style={{ color: project.accentColor }}>
+                    {project.subtitle}
+                </p>
+                <h3 className="text-xl font-semibold text-white mb-4 pr-12">{project.title}</h3>
+
+                <ProjectPreview project={project} onZoom={(src, alt) => setZoom({ src, alt })} />
+                <p className="mt-2 text-center text-[11px] text-gray-600">Toca la captura para ampliarla</p>
+
+                <p className="text-sm text-gray-300 leading-relaxed mt-4">{project.description}</p>
+
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                    {project.tech.map((t) => (
+                        <span key={t} className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/8">
+                            {t}
+                        </span>
+                    ))}
+                </div>
+
+                {(project.github || project.live) && (
+                    <div className="flex gap-3 mt-5">
+                        {project.github && (
+                            <a
+                                href={project.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-sm text-gray-200"
+                            >
+                                <i className="devicon-github-original text-base" />
+                                GitHub
+                            </a>
+                        )}
+                        {project.live && (
+                            <a
+                                href={project.live}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm text-white"
+                                style={{ background: `${project.accentColor}30`, border: `1px solid ${project.accentColor}60` }}
+                            >
+                                <ExternalLink className="w-4 h-4" />
+                                Ver web
+                            </a>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {zoom && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 p-2"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setZoom(null);
+                    }}
+                >
+                    <button
+                        type="button"
+                        aria-label="Cerrar imagen"
+                        className="absolute top-4 right-4 flex items-center justify-center w-11 h-11 rounded-full bg-zinc-900/90 border border-white/10 text-gray-300"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                    <img src={zoom.src} alt={zoom.alt} className="max-w-full max-h-full object-contain" />
+                </div>
+            )}
+        </div>
+    );
+}
+
 export default function Proyectos() {
     const [activeId, setActiveId] = useState(projects[0].id);
+    const [modalId, setModalId] = useState<string | null>(null);
 
     const activeProject = projects.find((p) => p.id === activeId) ?? projects[0];
+    const modalProject = projects.find((p) => p.id === modalId) ?? null;
+
+    const handleSelect = (id: string) => {
+        setActiveId(id);
+        // En móvil/tablet no hay panel de preview: se abre el modal
+        if (window.matchMedia("(max-width: 1023px)").matches) setModalId(id);
+    };
 
     return (
         <section id="proyectos" className="py-24 px-6">
@@ -247,7 +434,7 @@ export default function Proyectos() {
                         {projects.map((project) => (
                             <div
                                 key={project.id}
-                                onClick={() => setActiveId(project.id)}
+                                onClick={() => handleSelect(project.id)}
                                 className={`
                                     group relative rounded-2xl border p-6 cursor-pointer
                                     transition-all duration-300
@@ -281,20 +468,25 @@ export default function Proyectos() {
                                     <h3 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${activeId === project.id ? "text-white" : "text-gray-400 group-hover:text-gray-200"}`}>
                                         {project.title}
                                     </h3>
-                                    <p className="text-sm text-gray-500 leading-relaxed lg:line-clamp-2">
+                                    <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">
                                         {project.description}
                                     </p>
 
                                     {/* Tech badges */}
                                     <div className="flex flex-wrap gap-1.5 mt-3">
-                                        {project.tech.map((t) => (
+                                        {project.tech.map((t, i) => (
                                             <span
                                                 key={t}
-                                                className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-500 border border-white/8"
+                                                className={`text-xs px-2 py-0.5 rounded-full bg-white/5 text-gray-500 border border-white/8 ${i >= 4 ? "hidden lg:inline-block" : ""}`}
                                             >
                                                 {t}
                                             </span>
                                         ))}
+                                        {project.tech.length > 4 && (
+                                            <span className="lg:hidden text-xs px-2 py-0.5 text-gray-600">
+                                                +{project.tech.length - 4}
+                                            </span>
+                                        )}
                                     </div>
 
                                     {/* Links */}
@@ -305,7 +497,7 @@ export default function Proyectos() {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors duration-200"
+                                                className="flex items-center gap-1.5 text-xs py-2 lg:py-0 text-gray-500 hover:text-white transition-colors duration-200"
                                             >
                                                 <i className="devicon-github-original text-sm" />
                                                 GitHub
@@ -317,11 +509,17 @@ export default function Proyectos() {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors duration-200"
+                                                className="flex items-center gap-1.5 text-xs py-2 lg:py-0 text-gray-500 hover:text-white transition-colors duration-200"
                                             >
                                                 <ExternalLink className="w-3.5 h-3.5" />
                                             </a>
                                         )}
+                                        <span
+                                            className="ml-auto lg:hidden flex items-center gap-1 text-xs py-2"
+                                            style={{ color: project.accentColor }}
+                                        >
+                                            Ver detalle <ArrowRight className="w-3 h-3" />
+                                        </span>
                                         <span className="ml-auto hidden lg:flex items-center gap-1 text-xs transition-all duration-300"
                                             style={{ color: activeId === project.id ? project.accentColor : "transparent" }}>
                                             Ver preview <ArrowRight className="w-3 h-3" />
@@ -329,9 +527,9 @@ export default function Proyectos() {
                                     </div>
                                 </div>
 
-                                {/* Preview en móvil */}
+                                {/* Miniatura en móvil: la preview completa va en el modal */}
                                 <div className="mt-4 lg:hidden">
-                                    <ProjectPreview project={project} />
+                                    <ProjectThumbnail project={project} />
                                 </div>
                             </div>
                         ))}
@@ -364,10 +562,23 @@ export default function Proyectos() {
                 </div>
             </div>
 
+            {modalProject && <ProjectModal project={modalProject} onClose={() => setModalId(null)} />}
+
             <style>{`
                 @keyframes fadeInUp {
                     from { opacity: 0; transform: translateY(10px); }
                     to   { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes modalFade {
+                    from { opacity: 0; }
+                    to   { opacity: 1; }
+                }
+                @keyframes modalScale {
+                    from { opacity: 0; transform: scale(0.92); }
+                    to   { opacity: 1; transform: scale(1); }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    [role="dialog"], [role="dialog"] > div { animation: none !important; }
                 }
             `}</style>
         </section>

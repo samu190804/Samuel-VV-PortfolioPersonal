@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Briefcase, GraduationCap } from "lucide-react";
+import { Briefcase, GraduationCap, ChevronDown } from "lucide-react";
 
 type TechBadge = string;
 
@@ -68,7 +68,14 @@ const typeConfig = {
     },
 };
 
-function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number }) {
+type TimelineCardProps = {
+    entry: TimelineEntry;
+    index: number;
+    open: boolean;
+    onToggle: () => void;
+};
+
+function TimelineCard({ entry, index, open, onToggle }: TimelineCardProps) {
     const config = typeConfig[entry.type];
     const ref = useRef<HTMLDivElement>(null);
     const [visible, setVisible] = useState(false);
@@ -85,7 +92,7 @@ function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number })
     return (
         <div
             ref={ref}
-            className="relative flex gap-6 md:gap-10"
+            className="relative flex gap-4 md:gap-10"
             style={{
                 opacity: visible ? 1 : 0,
                 transform: visible ? "translateY(0)" : "translateY(24px)",
@@ -103,7 +110,8 @@ function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number })
             {/* Tarjeta */}
             <div
                 className={`
-                    mb-10 flex-1 rounded-2xl border p-6
+                    mb-6 md:mb-10 flex-1 min-w-0 rounded-2xl border p-4 md:p-6
+                    cursor-pointer md:cursor-default
                     bg-zinc-900/50 backdrop-blur-sm
                     transition-all duration-300 group
                     hover:-translate-y-1
@@ -113,6 +121,7 @@ function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number })
                     boxShadow: `0 0 0 0px ${config.color}`,
                     transition: "box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease",
                 }}
+                onClick={onToggle}
                 onMouseEnter={(e) => {
                     (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 1px ${config.color}40, 0 8px 24px ${config.color}10`;
                 }}
@@ -135,13 +144,30 @@ function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number })
                             {entry.organization}
                         </p>
                     </div>
-                    {/* Fecha */}
-                    <span className="text-xs font-mono text-gray-500 shrink-0 mt-1">
-                        {entry.date}
-                    </span>
+                    {/* Fecha + chevron (el chevron solo en móvil) */}
+                    <div className="flex items-center gap-2 shrink-0 mt-1">
+                        <span className="text-xs font-mono text-gray-500">
+                            {entry.date}
+                        </span>
+                        <button
+                            type="button"
+                            aria-expanded={open}
+                            aria-label={open ? "Ocultar detalles" : "Ver detalles"}
+                            className={`md:hidden flex items-center justify-center w-11 h-11 -m-3 rounded-full ${config.textClass}`}
+                        >
+                            <ChevronDown
+                                className="w-5 h-5 transition-transform duration-300"
+                                style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+                            />
+                        </button>
+                    </div>
                 </div>
 
-                {/* Descripción o bullets */}
+                {/* Descripción o bullets: colapsable en móvil, siempre visible en escritorio */}
+                <div
+                    className={`grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none md:grid-rows-[1fr]! ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}
+                >
+                <div className="overflow-hidden">
                 {entry.description && (
                     <p className="text-gray-400 text-sm leading-relaxed">
                         {entry.description}
@@ -157,6 +183,8 @@ function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number })
                         ))}
                     </ul>
                 )}
+                </div>
+                </div>
 
                 {/* Tech badges */}
                 {entry.tech && (
@@ -177,8 +205,11 @@ function TimelineCard({ entry, index }: { entry: TimelineEntry; index: number })
 }
 
 export default function Trayectoria() {
+    // En móvil solo una tarjeta abierta a la vez
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     return (
-        <section id="trayectoria" className="py-24 px-6">
+        <section id="trayectoria" className="py-24 px-4 md:px-6">
             <div className="container mx-auto max-w-3xl">
 
                 {/* Cabecera */}
@@ -194,7 +225,13 @@ export default function Trayectoria() {
                 {/* Timeline */}
                 <div>
                     {entries.map((entry, i) => (
-                        <TimelineCard key={i} entry={entry} index={i} />
+                        <TimelineCard
+                            key={i}
+                            entry={entry}
+                            index={i}
+                            open={openIndex === i}
+                            onToggle={() => setOpenIndex(openIndex === i ? null : i)}
+                        />
                     ))}
                 </div>
             </div>
